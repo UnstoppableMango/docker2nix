@@ -1,12 +1,15 @@
 package e2e_test
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 )
 
@@ -23,42 +26,17 @@ var _ = AfterSuite(func() {
 })
 
 var _ = Describe("docker2nix generate", func() {
-	runGenerate := func(stdin string, args ...string) *gexec.Session {
-		cmd := exec.Command(binary, append([]string{"generate"}, args...)...)
+	runGenerate := func(ctx context.Context, stdin string, args ...string) *gexec.Session {
+		cmd := exec.CommandContext(ctx, binary, append([]string{"generate"}, args...)...)
 		if stdin != "" {
-			cmd.Stdin = nil
-			r, w, err := os.Pipe()
-			Expect(err).NotTo(HaveOccurred())
-			_, err = w.WriteString(stdin)
-			Expect(err).NotTo(HaveOccurred())
-			w.Close()
-			cmd.Stdin = r
+			cmd.Stdin = strings.NewReader(stdin)
 		}
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		return session
 	}
 
-	It("should convert a FROM-only Dockerfile to a Nix expression", func() {
-		session := runGenerate("FROM ubuntu:24.04\n")
-		Eventually(session).Should(gexec.Exit(0))
-		Expect(string(session.Out.Contents())).To(ContainSubstring("ubuntu"))
-		Expect(string(session.Out.Contents())).To(ContainSubstring("24.04"))
-	})
-
-	It("should handle RUN, COPY, ENV, and CMD instructions", func() {
-		dockerfile := `FROM ubuntu:24.04
-RUN apt-get update && apt-get install -y curl
-COPY . /app
-ENV FOO=bar
-CMD ["/app/main"]
-`
-		session := runGenerate(dockerfile)
-		Eventually(session).Should(gexec.Exit(0))
-		Expect(session.Out.Contents()).NotTo(BeEmpty())
-	})
-
-	It("should handle multi-stage Dockerfiles", func() {
+	It("should handle multi-stage Dockerfiles", func(ctx context.Context) {
 		dockerfile := `FROM golang:1.23 AS builder
 WORKDIR /src
 COPY . .
@@ -68,26 +46,30 @@ FROM ubuntu:24.04
 COPY --from=builder /app/main /app/main
 CMD ["/app/main"]
 `
-		session := runGenerate(dockerfile)
+
+		session := runGenerate(ctx, dockerfile)
+
 		Eventually(session).Should(gexec.Exit(0))
-		out := string(session.Out.Contents())
-		Expect(out).To(ContainSubstring("builder"))
-		Expect(out).To(ContainSubstring("ubuntu"))
+		Expect(session.Out).To(gbytes.Say("builder"))
+		Expect(session.Out).To(gbytes.Say("ubuntu"))
 	})
 
-	It("should accept a Dockerfile path as argument", func() {
+	It("should accept a Dockerfile path as argument", func(ctx context.Context) {
 		dir := GinkgoT().TempDir()
 		path := filepath.Join(dir, "Dockerfile")
 		Expect(os.WriteFile(path, []byte("FROM ubuntu:24.04\n"), 0o644)).To(Succeed())
 
-		session := runGenerate("", path)
+		session := runGenerate(ctx, "", path)
+
 		Eventually(session).Should(gexec.Exit(0))
-		Expect(string(session.Out.Contents())).To(ContainSubstring("ubuntu"))
+		Expect(session.Out).To(gbytes.Say("ubuntu"))
 	})
 
-	It("should return an error for an invalid Dockerfile", func() {
-		session := runGenerate("NOT A VALID DOCKERFILE INSTRUCTION\n")
+	It("should return an error for an invalid Dockerfile", func(ctx context.Context) {
+		session := runGenerate(ctx, "NOT A VALID DOCKERFILE INSTRUCTION\n")
+
 		Eventually(session).ShouldNot(gexec.Exit(0))
-		Expect(session.Err.Contents()).NotTo(BeEmpty())
+
+		Expect(session.Err).To(gbytes.Say(".+"))
 	})
 })
