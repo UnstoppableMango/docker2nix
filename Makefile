@@ -26,3 +26,5 @@ go.sum: go.mod ${GO_SRC}
 
 nix/gomod2nix.toml: go.sum ${GO_SRC}
 	$(GOMOD2NIX) generate --dir ${CURDIR} --outdir ${@D}
+
+.PHONY: test

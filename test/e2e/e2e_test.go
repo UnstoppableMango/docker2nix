@@ -50,8 +50,9 @@ CMD ["/app/main"]
 		session := runGenerate(ctx, dockerfile)
 
 		Eventually(session).Should(gexec.Exit(0))
+		Expect(session.Out).To(gbytes.Say(`dockerTools\.buildLayeredImage`))
 		Expect(session.Out).To(gbytes.Say("builder"))
-		Expect(session.Out).To(gbytes.Say("ubuntu"))
+		Expect(session.Out).To(gbytes.Say(`name = "ubuntu"`))
 	})
 
 	It("should accept a Dockerfile path as argument", func(ctx context.Context) {
@@ -62,7 +63,9 @@ CMD ["/app/main"]
 		session := runGenerate(ctx, "", path)
 
 		Eventually(session).Should(gexec.Exit(0))
-		Expect(session.Out).To(gbytes.Say("ubuntu"))
+		Expect(session.Out).To(gbytes.Say(`dockerTools\.buildLayeredImage`))
+		Expect(session.Out).To(gbytes.Say(`name = "ubuntu"`))
+		Expect(session.Out).To(gbytes.Say(`tag = "24\.04"`))
 	})
 
 	It("should return an error for an invalid Dockerfile", func(ctx context.Context) {

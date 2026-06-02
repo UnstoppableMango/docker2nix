@@ -7,9 +7,9 @@ service Docker2NixService {
 }
 
 message GenerateRequest {
-  // TODO
+  string dockerfile = 1;
 }
 
 message GenerateResponse {
-  // TODO
+  string nix = 1;
 }
