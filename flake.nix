@@ -20,6 +20,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.inputs.systems.follows = "systems";
     };
+
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    mangonix = {
+      url = "github:UnstoppableMango/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "systems";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.gomod2nix.follows = "gomod2nix";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+      inputs.nix2container.follows = "nix2container";
+    };
   };
 
   outputs =
@@ -43,6 +58,7 @@
 
           devShells.default = pkgs.mkShellNoCC {
             packages = with pkgs; [
+              buf
               direnv
               go
               gomod2nix
@@ -50,6 +66,7 @@
               ginkgo
               gnumake
               nixfmt
+              protoc-gen-go
             ];
 
             GO = "${pkgs.go}/bin/go";

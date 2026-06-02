@@ -1,11 +1,11 @@
 {
   buildGoApplication,
-  lib,
   ginkgo,
+  lib,
   version,
 }:
 buildGoApplication {
-  pname = "";
+  pname = "docker2nix";
   inherit version;
 
   src = lib.cleanSource ../.;
@@ -14,6 +14,6 @@ buildGoApplication {
   nativeCheckInputs = [ ginkgo ];
 
   checkPhase = ''
-    ginkgo run ./...
+    ginkgo run -r
   '';
 }

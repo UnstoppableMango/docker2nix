@@ -1,0 +1,16 @@
+version: v2
+
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/unstoppablemango/docker2nix/pkg
+
+plugins:
+  - local: protoc-gen-go
+    opt:
+      - paths=source_relative
+    out: pkg
+
+inputs:
+  - directory: proto

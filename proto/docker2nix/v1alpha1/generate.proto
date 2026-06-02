@@ -1,0 +1,15 @@
+edition = "2024";
+
+package docker2nix.v1alpha1;
+
+service Docker2NixService {
+  rpc Generate(GenerateRequest) returns (GenerateResponse);
+}
+
+message GenerateRequest {
+  // TODO
+}
+
+message GenerateResponse {
+  // TODO
+}
