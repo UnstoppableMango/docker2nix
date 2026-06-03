@@ -38,10 +38,12 @@ var generateCmd = &cobra.Command{
 
 		var format docker2nixv1alpha1.Format
 		switch generateFormat {
+		case "docker-tools":
+			format = docker2nixv1alpha1.Format_FORMAT_DOCKER_TOOLS
 		case "nix2container":
 			format = docker2nixv1alpha1.Format_FORMAT_NIX2CONTAINER
 		default:
-			format = docker2nixv1alpha1.Format_FORMAT_DOCKER_TOOLS
+			cli.Fail(fmt.Errorf("unsupported format: %q", generateFormat))
 		}
 
 		s := string(content)

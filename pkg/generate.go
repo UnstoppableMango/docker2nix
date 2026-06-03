@@ -29,10 +29,13 @@ func Generate(ctx context.Context, req *docker2nixv1alpha1.GenerateRequest) (*do
 	}
 
 	var nix string
-	if req.GetFormat() == docker2nixv1alpha1.Format_FORMAT_NIX2CONTAINER {
-		nix = renderNix2Container(stages)
-	} else {
+	switch req.GetFormat() {
+	case docker2nixv1alpha1.Format_FORMAT_UNSPECIFIED, docker2nixv1alpha1.Format_FORMAT_DOCKER_TOOLS:
 		nix = renderNix(stages)
+	case docker2nixv1alpha1.Format_FORMAT_NIX2CONTAINER:
+		nix = renderNix2Container(stages)
+	default:
+		return nil, fmt.Errorf("unsupported format: %v", req.GetFormat())
 	}
 	resp := docker2nixv1alpha1.GenerateResponse_builder{Nix: &nix}
 	return resp.Build(), nil
