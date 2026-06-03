@@ -63,6 +63,64 @@ CMD ["/app/main"]
 		Expect(resp.GetNix()).To(ContainSubstring(`name = "ubuntu"`))
 	})
 
+	It("should use the last CMD when multiple CMD instructions are present", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+CMD ["/first"]
+CMD ["/last"]
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring(`"/last"`))
+		Expect(resp.GetNix()).NotTo(ContainSubstring(`"/first"`))
+	})
+
+	It("should parse registry:port/image:tag without splitting on the registry colon", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new("FROM localhost:5000/myimg:v1\n"),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring(`name = "localhost:5000/myimg"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`tag = "v1"`))
+	})
+
+	It("should sanitize hyphenated stage names to valid Nix identifiers", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM golang:1.23 AS my-builder
+WORKDIR /src
+
+FROM ubuntu:24.04
+COPY --from=my-builder /src/app /app
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("my_builder"))
+		Expect(resp.GetNix()).NotTo(ContainSubstring("my-builder"))
+	})
+
+	It("should escape Nix interpolation sequences in ENV values", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			// $$ in Dockerfile produces a literal $ in the value
+			Dockerfile: new(`FROM ubuntu:24.04
+ENV MSG=$${inject}
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring(`\${inject}`))
+	})
+
 	It("should return an error for an invalid Dockerfile", func(ctx context.Context) {
 		req := docker2nix.GenerateRequest_builder{
 			Dockerfile: new("NOT A VALID DOCKERFILE INSTRUCTION\n"),
