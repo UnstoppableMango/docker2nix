@@ -8,6 +8,7 @@ var root = &cobra.Command{
 	Long:  `docker2nix is a tool to convert Dockerfiles to Nix expressions.`,
 }
 
+// Execute runs the root command.
 func Execute() error {
 	return root.Execute()
 }

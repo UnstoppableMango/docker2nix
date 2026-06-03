@@ -62,12 +62,25 @@
             inherit (inputs.nix2container.packages.${system}) nix2container;
           };
 
+          checks.golangci-lint = pkgs.buildGoApplication {
+            name = "docker2nix-lint";
+            src = pkgs.lib.cleanSource ./.;
+            modules = ./nix/gomod2nix.toml;
+            nativeBuildInputs = [ pkgs.golangci-lint ];
+            buildPhase = ''
+              HOME=$TMPDIR golangci-lint run ./...
+            '';
+            installPhase = "touch $out";
+            doCheck = false;
+          };
+
           devShells.default = pkgs.mkShellNoCC {
             packages = with pkgs; [
               buf
               direnv
               go
               gomod2nix
+              golangci-lint
               gopls
               ginkgo
               gnumake

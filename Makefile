@@ -21,8 +21,11 @@ coverprofile.out: ${GO_SRC}
 update:
 	nix flake update
 
-check lint:
+check:
 	nix flake check
+
+lint:
+	golangci-lint run ./...
 
 format fmt:
 	nix fmt
