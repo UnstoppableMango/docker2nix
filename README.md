@@ -26,6 +26,7 @@ docker2nix generate ./Dockerfile
 ### Example
 
 Input:
+
 ```dockerfile
 FROM ubuntu:24.04
 ENV FOO=bar
@@ -33,6 +34,7 @@ CMD ["/app/main"]
 ```
 
 Output:
+
 ```nix
 dockerTools.buildLayeredImage {
   name = "ubuntu";
@@ -100,14 +102,14 @@ make tidy
 
 ## Supported Dockerfile Instructions
 
-| Instruction        | Status                   |
+| Instruction | Status |
 | ------------------ | ------------------------ |
-| `FROM`             | Supported                |
-| `ENV`              | Supported                |
-| `CMD`              | Supported                |
-| `RUN`              | Parsed, not yet rendered |
-| `COPY`             | Parsed, not yet rendered |
-| Multi-stage (`AS`) | Supported                |
+| `FROM` | Supported |
+| `ENV` | Supported |
+| `CMD` | Supported |
+| `RUN` | Parsed, not yet rendered |
+| `COPY` | Parsed, not yet rendered |
+| Multi-stage (`AS`) | Supported |
 
 ## License
 

@@ -41,6 +41,7 @@ Dockerfile-to-Nix expression converter. CLI built with Cobra; core logic in `pkg
 **Core function:** `pkg/generate.go:Generate()` — parses a Dockerfile and renders a `dockerTools.buildLayeredImage` expression; extend it as additional Dockerfile instructions are supported.
 
 **Tests:**
+
 - Unit: `pkg/generate_test.go` — tests `Generate()` directly with Dockerfile strings
 - E2E: `test/e2e/e2e_test.go` — tests the compiled binary via stdin/file input using `gexec`
 - Both suites use Ginkgo v2 + Gomega
