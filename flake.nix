@@ -47,6 +47,7 @@
         { pkgs, system, ... }:
         let
           version = "0.0.1";
+          docker2nix = pkgs.callPackage ./nix { inherit version; };
         in
         {
           _module.args.pkgs = import inputs.nixpkgs {
@@ -54,7 +55,12 @@
             overlays = with inputs; [ gomod2nix.overlays.default ];
           };
 
-          packages.default = pkgs.callPackage ./nix { inherit version; };
+          packages.default = docker2nix;
+
+          packages.container = pkgs.callPackage ./nix/container.nix {
+            inherit docker2nix version;
+            inherit (inputs.nix2container.packages.${system}) nix2container;
+          };
 
           devShells.default = pkgs.mkShellNoCC {
             packages = with pkgs; [
