@@ -85,14 +85,14 @@ func writeStage(b *strings.Builder, s instructions.Stage, prefix string) {
 		if len(envs) > 0 {
 			fmt.Fprintf(b, "%s    Env = [\n", prefix)
 			for _, e := range envs {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
 		if len(cmds) > 0 {
 			fmt.Fprintf(b, "%s    Cmd = [\n", prefix)
 			for _, c := range cmds {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
@@ -116,14 +116,14 @@ func writeAttrs(b *strings.Builder, s instructions.Stage, prefix string) {
 		if len(envs) > 0 {
 			fmt.Fprintf(b, "%s    Env = [\n", prefix)
 			for _, e := range envs {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
 		if len(cmds) > 0 {
 			fmt.Fprintf(b, "%s    Cmd = [\n", prefix)
 			for _, c := range cmds {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
@@ -222,14 +222,14 @@ func writeStageNix2Container(b *strings.Builder, s instructions.Stage, prefix st
 		if len(envs) > 0 {
 			fmt.Fprintf(b, "%s    env = [\n", prefix)
 			for _, e := range envs {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
 		if len(cmds) > 0 {
 			fmt.Fprintf(b, "%s    cmd = [\n", prefix)
 			for _, c := range cmds {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
@@ -253,14 +253,14 @@ func writeAttrsNix2Container(b *strings.Builder, s instructions.Stage, prefix st
 		if len(envs) > 0 {
 			fmt.Fprintf(b, "%s    env = [\n", prefix)
 			for _, e := range envs {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
 		if len(cmds) > 0 {
 			fmt.Fprintf(b, "%s    cmd = [\n", prefix)
 			for _, c := range cmds {
-				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
+				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
 			}
 			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
