@@ -48,7 +48,7 @@ func renderNix(stages []instructions.Stage) string {
 		b.WriteString("dockerTools.buildLayeredImage\n")
 		b.WriteString("  (let\n")
 		for _, s := range bindings {
-			b.WriteString("    " + s.Name + " = ")
+			fmt.Fprintf(&b, "    %s = ", sanitizeNixIdent(s.Name))
 			writeStage(&b, s, "    ")
 			b.WriteString(";\n")
 		}
@@ -69,29 +69,29 @@ func writeStage(b *strings.Builder, s instructions.Stage, prefix string) {
 	cmds := extractCmds(s)
 
 	b.WriteString("dockerTools.buildLayeredImage {\n")
-	b.WriteString(prefix + `  name = "` + name + `";` + "\n")
-	b.WriteString(prefix + `  tag = "` + tag + `";` + "\n")
+	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
+	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
 
 	if len(envs) > 0 || len(cmds) > 0 {
-		b.WriteString(prefix + "  config = {\n")
+		fmt.Fprintf(b, "%s  config = {\n", prefix)
 		if len(envs) > 0 {
-			b.WriteString(prefix + "    Env = [\n")
+			fmt.Fprintf(b, "%s    Env = [\n", prefix)
 			for _, e := range envs {
-				b.WriteString(prefix + `      "` + e + `";` + "\n")
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
 			}
-			b.WriteString(prefix + "    ];\n")
+			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
 		if len(cmds) > 0 {
-			b.WriteString(prefix + "    Cmd = [\n")
+			fmt.Fprintf(b, "%s    Cmd = [\n", prefix)
 			for _, c := range cmds {
-				b.WriteString(prefix + `      "` + c + `";` + "\n")
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
 			}
-			b.WriteString(prefix + "    ];\n")
+			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
-		b.WriteString(prefix + "  };\n")
+		fmt.Fprintf(b, "%s  };\n", prefix)
 	}
 
-	b.WriteString(prefix + "}")
+	fmt.Fprintf(b, "%s}", prefix)
 }
 
 func writeAttrs(b *strings.Builder, s instructions.Stage, prefix string) {
@@ -99,38 +99,45 @@ func writeAttrs(b *strings.Builder, s instructions.Stage, prefix string) {
 	envs := extractEnvs(s)
 	cmds := extractCmds(s)
 
-	b.WriteString(prefix + "{\n")
-	b.WriteString(prefix + `  name = "` + name + `";` + "\n")
-	b.WriteString(prefix + `  tag = "` + tag + `";` + "\n")
+	fmt.Fprintf(b, "%s{\n", prefix)
+	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
+	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
 
 	if len(envs) > 0 || len(cmds) > 0 {
-		b.WriteString(prefix + "  config = {\n")
+		fmt.Fprintf(b, "%s  config = {\n", prefix)
 		if len(envs) > 0 {
-			b.WriteString(prefix + "    Env = [\n")
+			fmt.Fprintf(b, "%s    Env = [\n", prefix)
 			for _, e := range envs {
-				b.WriteString(prefix + `      "` + e + `";` + "\n")
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
 			}
-			b.WriteString(prefix + "    ];\n")
+			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
 		if len(cmds) > 0 {
-			b.WriteString(prefix + "    Cmd = [\n")
+			fmt.Fprintf(b, "%s    Cmd = [\n", prefix)
 			for _, c := range cmds {
-				b.WriteString(prefix + `      "` + c + `";` + "\n")
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
 			}
-			b.WriteString(prefix + "    ];\n")
+			fmt.Fprintf(b, "%s    ];\n", prefix)
 		}
-		b.WriteString(prefix + "  };\n")
+		fmt.Fprintf(b, "%s  };\n", prefix)
 	}
 
-	b.WriteString(prefix + "}")
+	fmt.Fprintf(b, "%s}", prefix)
 }
 
 func parseImage(baseName string) (name, tag string) {
-	parts := strings.SplitN(baseName, ":", 2)
-	if len(parts) == 2 {
-		return parts[0], parts[1]
+	// Handle digest references (e.g. ubuntu@sha256:abc)
+	if name, digest, ok := strings.Cut(baseName, "@"); ok {
+		return name, digest
 	}
-	return parts[0], "latest"
+	// Find the tag after the last colon that follows the last slash,
+	// so registry:port in the host portion is not mistaken for a tag.
+	lastSlash := strings.LastIndex(baseName, "/")
+	rest := baseName[lastSlash+1:]
+	if i := strings.LastIndex(rest, ":"); i >= 0 {
+		return baseName[:lastSlash+1+i], rest[i+1:]
+	}
+	return baseName, "latest"
 }
 
 func extractEnvs(s instructions.Stage) []string {
@@ -146,10 +153,34 @@ func extractEnvs(s instructions.Stage) []string {
 }
 
 func extractCmds(s instructions.Stage) []string {
+	// Docker uses the last CMD instruction; iterate all to find it.
+	var result []string
 	for _, cmd := range s.Commands {
 		if c, ok := cmd.(*instructions.CmdCommand); ok {
-			return c.CmdLine
+			result = c.CmdLine
 		}
 	}
-	return nil
+	return result
+}
+
+func nixEscape(s string) string {
+	s = strings.ReplaceAll(s, "\\", "\\\\")
+	s = strings.ReplaceAll(s, "\"", "\\\"")
+	s = strings.ReplaceAll(s, "${", "\\${")
+	return s
+}
+
+func sanitizeNixIdent(s string) string {
+	var b strings.Builder
+	for i, r := range s {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r == '_':
+			b.WriteRune(r)
+		case r >= '0' && r <= '9' && i > 0:
+			b.WriteRune(r)
+		default:
+			b.WriteRune('_')
+		}
+	}
+	return b.String()
 }

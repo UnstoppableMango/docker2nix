@@ -52,6 +52,8 @@ Dockerfile-to-Nix expression converter. CLI built with Cobra; core logic in `pkg
 
 ## Code Style
 
+**Go version:** This project uses Go 1.26.3. Use the current Go language spec; do not assume pre-1.26 behavior. For example, `new(value)` creates a pointer to a copy of `value` and is valid syntax.
+
 **Proto builder pattern.** Assign the builder to a variable named `req`, then call `.Build()` inline at the call site.
 
 ```go
