@@ -3,7 +3,7 @@ module github.com/unstoppablemango/docker2nix
 go 1.26.3
 
 require (
-	github.com/moby/buildkit v0.28.1
+	github.com/moby/buildkit v0.30.0
 	github.com/onsi/ginkgo/v2 v2.29.0
 	github.com/onsi/gomega v1.41.0
 	github.com/spf13/cobra v1.10.2
