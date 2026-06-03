@@ -38,7 +38,7 @@ Dockerfile-to-Nix expression converter. CLI built with Cobra; core logic in `pkg
 
 **Protobuf-driven types:** `GenerateRequest` and `GenerateResponse` are defined in `proto/docker2nix/v1alpha1/generate.proto`, generated into `pkg/docker2nix/v1alpha1/generate.pb.go`. Type aliases live in `pkg/types.go`.
 
-**Core function:** `pkg/generate.go:Generate()` — currently `panic("not implemented")`, this is the primary implementation target.
+**Core function:** `pkg/generate.go:Generate()` — parses a Dockerfile and renders a `dockerTools.buildLayeredImage` expression; extend it as additional Dockerfile instructions are supported.
 
 **Tests:**
 - Unit: `pkg/generate_test.go` — tests `Generate()` directly with Dockerfile strings
