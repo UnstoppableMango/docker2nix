@@ -1,0 +1,21 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - exhaustive
+    - gocritic
+    - misspell
+    - prealloc
+    - revive
+    - unconvert
+    - unparam
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+
+issues:
+  exclude-rules:
+    - path: ".*\\.pb\\.go"
+      linters:
+        - all
