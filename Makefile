@@ -13,6 +13,11 @@ container:
 test:
 	$(GINKGO) run -r
 
+cover: coverprofile.out
+
+coverprofile.out: ${GO_SRC}
+	$(GINKGO) run -r --cover
+
 update:
 	nix flake update
 
