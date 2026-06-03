@@ -70,17 +70,10 @@ jobs:
         with:
           images: ghcr.io/unstoppablemango/docker2nix
 
-      - name: Login to ghcr.io
-        if: github.ref == 'refs/heads/main'
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Push container
         if: github.ref == 'refs/heads/main'
         run: |
           while IFS= read -r tag; do
-            nix run .#container.copyTo -- "docker://$tag"
+            nix run .#container.copyTo -- "docker://$tag" \
+              --dest-creds "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
           done <<< "${{ steps.meta.outputs.tags }}"
