@@ -2,12 +2,19 @@ edition = "2024";
 
 package docker2nix.v1alpha1;
 
+enum Format {
+  FORMAT_UNSPECIFIED = 0;
+  FORMAT_DOCKER_TOOLS = 1;
+  FORMAT_NIX2CONTAINER = 2;
+}
+
 service Docker2NixService {
   rpc Generate(GenerateRequest) returns (GenerateResponse);
 }
 
 message GenerateRequest {
   string dockerfile = 1;
+  Format format = 2;
 }
 
 message GenerateResponse {

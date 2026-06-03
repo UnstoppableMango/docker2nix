@@ -76,4 +76,20 @@ CMD ["/app/main"]
 
 		Expect(session.Err).To(gbytes.Say(".+"))
 	})
+
+	It("should emit nix2container.buildImage with --format nix2container", func(ctx context.Context) {
+		session := runGenerate(ctx, "FROM ubuntu:24.04\n", "--format", "nix2container")
+
+		Eventually(session).Should(gexec.Exit(0))
+		Expect(session.Out).To(gbytes.Say(`nix2container\.buildImage`))
+		Expect(session.Out).To(gbytes.Say(`name = "ubuntu"`))
+		Expect(session.Out).To(gbytes.Say(`tag = "24\.04"`))
+	})
+
+	It("should default to dockerTools.buildLayeredImage without --format flag", func(ctx context.Context) {
+		session := runGenerate(ctx, "FROM ubuntu:24.04\n")
+
+		Eventually(session).Should(gexec.Exit(0))
+		Expect(session.Out).To(gbytes.Say(`dockerTools\.buildLayeredImage`))
+	})
 })

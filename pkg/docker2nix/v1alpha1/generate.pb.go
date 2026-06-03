@@ -20,9 +20,54 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Format int32
+
+const (
+	Format_FORMAT_UNSPECIFIED   Format = 0
+	Format_FORMAT_DOCKER_TOOLS  Format = 1
+	Format_FORMAT_NIX2CONTAINER Format = 2
+)
+
+// Enum value maps for Format.
+var (
+	Format_name = map[int32]string{
+		0: "FORMAT_UNSPECIFIED",
+		1: "FORMAT_DOCKER_TOOLS",
+		2: "FORMAT_NIX2CONTAINER",
+	}
+	Format_value = map[string]int32{
+		"FORMAT_UNSPECIFIED":   0,
+		"FORMAT_DOCKER_TOOLS":  1,
+		"FORMAT_NIX2CONTAINER": 2,
+	}
+)
+
+func (x Format) Enum() *Format {
+	p := new(Format)
+	*p = x
+	return p
+}
+
+func (x Format) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Format) Descriptor() protoreflect.EnumDescriptor {
+	return file_docker2nix_v1alpha1_generate_proto_enumTypes[0].Descriptor()
+}
+
+func (Format) Type() protoreflect.EnumType {
+	return &file_docker2nix_v1alpha1_generate_proto_enumTypes[0]
+}
+
+func (x Format) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
 type GenerateRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Dockerfile  *string                `protobuf:"bytes,1,opt,name=dockerfile"`
+	xxx_hidden_Format      Format                 `protobuf:"varint,2,opt,name=format,enum=docker2nix.v1alpha1.Format"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -64,9 +109,23 @@ func (x *GenerateRequest) GetDockerfile() string {
 	return ""
 }
 
+func (x *GenerateRequest) GetFormat() Format {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_Format
+		}
+	}
+	return Format_FORMAT_UNSPECIFIED
+}
+
 func (x *GenerateRequest) SetDockerfile(v string) {
 	x.xxx_hidden_Dockerfile = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *GenerateRequest) SetFormat(v Format) {
+	x.xxx_hidden_Format = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
 }
 
 func (x *GenerateRequest) HasDockerfile() bool {
@@ -76,15 +135,28 @@ func (x *GenerateRequest) HasDockerfile() bool {
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
+func (x *GenerateRequest) HasFormat() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
 func (x *GenerateRequest) ClearDockerfile() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
 	x.xxx_hidden_Dockerfile = nil
+}
+
+func (x *GenerateRequest) ClearFormat() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Format = Format_FORMAT_UNSPECIFIED
 }
 
 type GenerateRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Dockerfile *string
+	Format     *Format
 }
 
 func (b0 GenerateRequest_builder) Build() *GenerateRequest {
@@ -92,8 +164,12 @@ func (b0 GenerateRequest_builder) Build() *GenerateRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Dockerfile != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
 		x.xxx_hidden_Dockerfile = b.Dockerfile
+	}
+	if b.Format != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Format = *b.Format
 	}
 	return m0
 }
@@ -180,30 +256,38 @@ var File_docker2nix_v1alpha1_generate_proto protoreflect.FileDescriptor
 
 const file_docker2nix_v1alpha1_generate_proto_rawDesc = "" +
 	"\n" +
-	"\"docker2nix/v1alpha1/generate.proto\x12\x13docker2nix.v1alpha1\"1\n" +
+	"\"docker2nix/v1alpha1/generate.proto\x12\x13docker2nix.v1alpha1\"f\n" +
 	"\x0fGenerateRequest\x12\x1e\n" +
 	"\n" +
 	"dockerfile\x18\x01 \x01(\tR\n" +
-	"dockerfile\"$\n" +
+	"dockerfile\x123\n" +
+	"\x06format\x18\x02 \x01(\x0e2\x1b.docker2nix.v1alpha1.FormatR\x06format\"$\n" +
 	"\x10GenerateResponse\x12\x10\n" +
-	"\x03nix\x18\x01 \x01(\tR\x03nix2l\n" +
+	"\x03nix\x18\x01 \x01(\tR\x03nix*S\n" +
+	"\x06Format\x12\x16\n" +
+	"\x12FORMAT_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13FORMAT_DOCKER_TOOLS\x10\x01\x12\x18\n" +
+	"\x14FORMAT_NIX2CONTAINER\x10\x022l\n" +
 	"\x11Docker2NixService\x12W\n" +
 	"\bGenerate\x12$.docker2nix.v1alpha1.GenerateRequest\x1a%.docker2nix.v1alpha1.GenerateResponseB\xe8\x01\n" +
 	"\x17com.docker2nix.v1alpha1B\rGenerateProtoP\x01ZQgithub.com/unstoppablemango/docker2nix/pkg/docker2nix/v1alpha1;docker2nixv1alpha1\xa2\x02\x03DXX\xaa\x02\x13Docker2nix.V1alpha1\xca\x02\x13Docker2nix\\V1alpha1\xe2\x02\x1fDocker2nix\\V1alpha1\\GPBMetadata\xea\x02\x14Docker2nix::V1alpha1b\beditionsp\xe9\a"
 
+var file_docker2nix_v1alpha1_generate_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_docker2nix_v1alpha1_generate_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_docker2nix_v1alpha1_generate_proto_goTypes = []any{
-	(*GenerateRequest)(nil),  // 0: docker2nix.v1alpha1.GenerateRequest
-	(*GenerateResponse)(nil), // 1: docker2nix.v1alpha1.GenerateResponse
+	(Format)(0),              // 0: docker2nix.v1alpha1.Format
+	(*GenerateRequest)(nil),  // 1: docker2nix.v1alpha1.GenerateRequest
+	(*GenerateResponse)(nil), // 2: docker2nix.v1alpha1.GenerateResponse
 }
 var file_docker2nix_v1alpha1_generate_proto_depIdxs = []int32{
-	0, // 0: docker2nix.v1alpha1.Docker2NixService.Generate:input_type -> docker2nix.v1alpha1.GenerateRequest
-	1, // 1: docker2nix.v1alpha1.Docker2NixService.Generate:output_type -> docker2nix.v1alpha1.GenerateResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: docker2nix.v1alpha1.GenerateRequest.format:type_name -> docker2nix.v1alpha1.Format
+	1, // 1: docker2nix.v1alpha1.Docker2NixService.Generate:input_type -> docker2nix.v1alpha1.GenerateRequest
+	2, // 2: docker2nix.v1alpha1.Docker2NixService.Generate:output_type -> docker2nix.v1alpha1.GenerateResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_docker2nix_v1alpha1_generate_proto_init() }
@@ -216,13 +300,14 @@ func file_docker2nix_v1alpha1_generate_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_docker2nix_v1alpha1_generate_proto_rawDesc), len(file_docker2nix_v1alpha1_generate_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_docker2nix_v1alpha1_generate_proto_goTypes,
 		DependencyIndexes: file_docker2nix_v1alpha1_generate_proto_depIdxs,
+		EnumInfos:         file_docker2nix_v1alpha1_generate_proto_enumTypes,
 		MessageInfos:      file_docker2nix_v1alpha1_generate_proto_msgTypes,
 	}.Build()
 	File_docker2nix_v1alpha1_generate_proto = out.File
