@@ -71,7 +71,7 @@ CMD ["/app/main"]
 	It("should return an error for an invalid Dockerfile", func(ctx context.Context) {
 		session := runGenerate(ctx, "NOT A VALID DOCKERFILE INSTRUCTION\n")
 
-		Eventually(session).ShouldNot(gexec.Exit(0))
+		Eventually(session).Should(gexec.Exit(1))
 
 		Expect(session.Err).To(gbytes.Say(".+"))
 	})
