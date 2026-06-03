@@ -27,6 +27,7 @@ var _ = AfterSuite(func() {
 
 var _ = Describe("docker2nix generate", func() {
 	runGenerate := func(ctx context.Context, stdin string, args ...string) *gexec.Session {
+		GinkgoHelper()
 		cmd := exec.CommandContext(ctx, binary, append([]string{"generate"}, args...)...)
 		if stdin != "" {
 			cmd.Stdin = strings.NewReader(stdin)
