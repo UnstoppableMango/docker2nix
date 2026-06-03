@@ -2,6 +2,7 @@
   buildGoApplication,
   ginkgo,
   lib,
+  nix,
   version,
 }:
 
@@ -12,9 +13,13 @@ buildGoApplication {
   src = lib.cleanSource ../.;
   modules = ./gomod2nix.toml;
 
-  nativeCheckInputs = [ ginkgo ];
+  nativeCheckInputs = [
+    ginkgo
+    nix
+  ];
 
   checkPhase = ''
+    export NIX_STATE_DIR=$(mktemp -d)
     ginkgo run -r
   '';
 
