@@ -25,7 +25,7 @@ var generateCmd = &cobra.Command{
 			if err != nil {
 				cli.Fail(err)
 			}
-			defer f.Close()
+			defer func() { _ = f.Close() }()
 			r = f
 		} else {
 			r = cmd.InOrStdin()
@@ -53,7 +53,9 @@ var generateCmd = &cobra.Command{
 			cli.Fail(err)
 		}
 
-		fmt.Fprint(cmd.OutOrStdout(), resp.GetNix())
+		if _, err := fmt.Fprint(cmd.OutOrStdout(), resp.GetNix()); err != nil {
+			cli.Fail(err)
+		}
 	},
 }
 
