@@ -132,3 +132,100 @@ ENV MSG=$${inject}
 		Expect(resp).To(BeNil())
 	})
 })
+
+var _ = Describe("Generate docker-tools explicit", func() {
+	format := docker2nix.FORMAT_DOCKER_TOOLS
+
+	It("should convert a FROM-only Dockerfile to a dockerTools expression", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new("FROM ubuntu:24.04\n"),
+			Format:     &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("dockerTools.buildLayeredImage"))
+		Expect(resp.GetNix()).NotTo(ContainSubstring("nix2container"))
+		Expect(resp.GetNix()).To(ContainSubstring(`name = "ubuntu"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`tag = "24.04"`))
+	})
+})
+
+var _ = Describe("Generate unknown format", func() {
+	It("should return an error for an unsupported format value", func(ctx context.Context) {
+		format := docker2nix.Format(99)
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new("FROM ubuntu:24.04\n"),
+			Format:     &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unsupported format"))
+		Expect(resp).To(BeNil())
+	})
+})
+
+var _ = Describe("Generate nix2container", func() {
+	format := docker2nix.FORMAT_NIX2CONTAINER
+
+	It("should convert a FROM-only Dockerfile to a nix2container expression", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new("FROM ubuntu:24.04\n"),
+			Format:     &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("nix2container.buildImage"))
+		Expect(resp.GetNix()).NotTo(ContainSubstring("dockerTools"))
+		Expect(resp.GetNix()).To(ContainSubstring(`name = "ubuntu"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`tag = "24.04"`))
+	})
+
+	It("should use lowercase env and cmd config keys", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+ENV FOO=bar
+CMD ["/app/main"]
+`),
+			Format: &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("nix2container.buildImage"))
+		Expect(resp.GetNix()).To(ContainSubstring(`env = [`))
+		Expect(resp.GetNix()).To(ContainSubstring(`cmd = [`))
+		Expect(resp.GetNix()).NotTo(ContainSubstring(`Env = [`))
+		Expect(resp.GetNix()).NotTo(ContainSubstring(`Cmd = [`))
+		Expect(resp.GetNix()).To(ContainSubstring(`"FOO=bar"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`"/app/main"`))
+	})
+
+	It("should handle multi-stage Dockerfiles", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM golang:1.23 AS builder
+WORKDIR /src
+COPY . .
+RUN go build -o /app/main .
+
+FROM ubuntu:24.04
+COPY --from=builder /app/main /app/main
+CMD ["/app/main"]
+`),
+			Format: &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("nix2container.buildImage"))
+		Expect(resp.GetNix()).To(ContainSubstring("builder"))
+		Expect(resp.GetNix()).To(ContainSubstring(`name = "ubuntu"`))
+	})
+})

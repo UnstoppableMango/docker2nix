@@ -8,7 +8,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/unmango/go/cli"
 	docker2nix "github.com/unstoppablemango/docker2nix/pkg"
+	docker2nixv1alpha1 "github.com/unstoppablemango/docker2nix/pkg/docker2nix/v1alpha1"
 )
+
+var generateFormat string
 
 var generateCmd = &cobra.Command{
 	Use:   "generate [Dockerfile]",
@@ -33,8 +36,18 @@ var generateCmd = &cobra.Command{
 			cli.Fail(err)
 		}
 
+		var format docker2nixv1alpha1.Format
+		switch generateFormat {
+		case "docker-tools":
+			format = docker2nixv1alpha1.Format_FORMAT_DOCKER_TOOLS
+		case "nix2container":
+			format = docker2nixv1alpha1.Format_FORMAT_NIX2CONTAINER
+		default:
+			cli.Fail(fmt.Errorf("unsupported format: %q", generateFormat))
+		}
+
 		s := string(content)
-		req := docker2nix.GenerateRequest_builder{Dockerfile: &s}
+		req := docker2nix.GenerateRequest_builder{Dockerfile: &s, Format: &format}
 		resp, err := docker2nix.Generate(cmd.Context(), req.Build())
 		if err != nil {
 			cli.Fail(err)
@@ -45,5 +58,6 @@ var generateCmd = &cobra.Command{
 }
 
 func init() {
+	generateCmd.Flags().StringVar(&generateFormat, "format", "docker-tools", "Output format: docker-tools, nix2container")
 	root.AddCommand(generateCmd)
 }

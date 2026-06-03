@@ -28,7 +28,15 @@ func Generate(ctx context.Context, req *docker2nixv1alpha1.GenerateRequest) (*do
 		return nil, fmt.Errorf("no stages in Dockerfile")
 	}
 
-	nix := renderNix(stages)
+	var nix string
+	switch req.GetFormat() {
+	case docker2nixv1alpha1.Format_FORMAT_UNSPECIFIED, docker2nixv1alpha1.Format_FORMAT_DOCKER_TOOLS:
+		nix = renderNix(stages)
+	case docker2nixv1alpha1.Format_FORMAT_NIX2CONTAINER:
+		nix = renderNix2Container(stages)
+	default:
+		return nil, fmt.Errorf("unsupported format: %v", req.GetFormat())
+	}
 	resp := docker2nixv1alpha1.GenerateResponse_builder{Nix: &nix}
 	return resp.Build(), nil
 }
@@ -168,6 +176,98 @@ func nixEscape(s string) string {
 	s = strings.ReplaceAll(s, "\"", "\\\"")
 	s = strings.ReplaceAll(s, "${", "\\${")
 	return s
+}
+
+func renderNix2Container(stages []instructions.Stage) string {
+	var b strings.Builder
+	final := stages[len(stages)-1]
+
+	var bindings []instructions.Stage
+	for _, s := range stages[:len(stages)-1] {
+		if s.Name != "" {
+			bindings = append(bindings, s)
+		}
+	}
+
+	if len(bindings) > 0 {
+		b.WriteString("nix2container.buildImage\n")
+		b.WriteString("  (let\n")
+		for _, s := range bindings {
+			fmt.Fprintf(&b, "    %s = ", sanitizeNixIdent(s.Name))
+			writeStageNix2Container(&b, s, "    ")
+			b.WriteString(";\n")
+		}
+		b.WriteString("  in\n")
+		writeAttrsNix2Container(&b, final, "  ")
+		b.WriteString(")\n")
+	} else {
+		writeStageNix2Container(&b, final, "")
+		b.WriteString("\n")
+	}
+
+	return b.String()
+}
+
+func writeStageNix2Container(b *strings.Builder, s instructions.Stage, prefix string) {
+	name, tag := parseImage(s.BaseName)
+	envs := extractEnvs(s)
+	cmds := extractCmds(s)
+
+	b.WriteString("nix2container.buildImage {\n")
+	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
+	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
+
+	if len(envs) > 0 || len(cmds) > 0 {
+		fmt.Fprintf(b, "%s  config = {\n", prefix)
+		if len(envs) > 0 {
+			fmt.Fprintf(b, "%s    env = [\n", prefix)
+			for _, e := range envs {
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
+			}
+			fmt.Fprintf(b, "%s    ];\n", prefix)
+		}
+		if len(cmds) > 0 {
+			fmt.Fprintf(b, "%s    cmd = [\n", prefix)
+			for _, c := range cmds {
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
+			}
+			fmt.Fprintf(b, "%s    ];\n", prefix)
+		}
+		fmt.Fprintf(b, "%s  };\n", prefix)
+	}
+
+	fmt.Fprintf(b, "%s}", prefix)
+}
+
+func writeAttrsNix2Container(b *strings.Builder, s instructions.Stage, prefix string) {
+	name, tag := parseImage(s.BaseName)
+	envs := extractEnvs(s)
+	cmds := extractCmds(s)
+
+	fmt.Fprintf(b, "%s{\n", prefix)
+	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
+	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
+
+	if len(envs) > 0 || len(cmds) > 0 {
+		fmt.Fprintf(b, "%s  config = {\n", prefix)
+		if len(envs) > 0 {
+			fmt.Fprintf(b, "%s    env = [\n", prefix)
+			for _, e := range envs {
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(e))
+			}
+			fmt.Fprintf(b, "%s    ];\n", prefix)
+		}
+		if len(cmds) > 0 {
+			fmt.Fprintf(b, "%s    cmd = [\n", prefix)
+			for _, c := range cmds {
+				fmt.Fprintf(b, "%s      \"%s\";\n", prefix, nixEscape(c))
+			}
+			fmt.Fprintf(b, "%s    ];\n", prefix)
+		}
+		fmt.Fprintf(b, "%s  };\n", prefix)
+	}
+
+	fmt.Fprintf(b, "%s}", prefix)
 }
 
 func sanitizeNixIdent(s string) string {
