@@ -11,6 +11,9 @@ import (
 )
 
 func Generate(ctx context.Context, req *docker2nixv1alpha1.GenerateRequest) (*docker2nixv1alpha1.GenerateResponse, error) {
+	if req == nil {
+		return nil, fmt.Errorf("nil request")
+	}
 	result, err := parser.Parse(strings.NewReader(req.GetDockerfile()))
 	if err != nil {
 		return nil, err
