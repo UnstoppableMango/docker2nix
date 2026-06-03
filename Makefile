@@ -7,6 +7,9 @@ GO_SRC ?= $(shell find . -name '*.go')
 build:
 	nix build .#
 
+container:
+	nix build .#container
+
 test:
 	$(GINKGO) run -r
 

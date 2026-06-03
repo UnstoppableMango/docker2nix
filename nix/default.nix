@@ -4,6 +4,7 @@
   lib,
   version,
 }:
+
 buildGoApplication {
   pname = "docker2nix";
   inherit version;
@@ -16,4 +17,12 @@ buildGoApplication {
   checkPhase = ''
     ginkgo run -r
   '';
+
+  meta = {
+    description = "Convert Dockerfiles to Nix expressions";
+    homepage = "https://github.com/UnstoppableMango/docker2nix";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ ];
+    mainProgram = "docker2nix";
+  };
 }
