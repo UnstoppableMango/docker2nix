@@ -27,7 +27,7 @@ var _ = AfterSuite(func() {
 
 func runGenerate(ctx context.Context, stdin string, args ...string) *gexec.Session {
 	GinkgoHelper()
-	cmd := exec.CommandContext(ctx, binary, append([]string{"generate"}, args...)...)
+	cmd := exec.CommandContext(ctx, binary, args...)
 	if stdin != "" {
 		cmd.Stdin = strings.NewReader(stdin)
 	}
@@ -49,7 +49,7 @@ func nixParse(ctx context.Context, expr string) *gexec.Session {
 	return session
 }
 
-var _ = Describe("docker2nix generate", func() {
+var _ = Describe("docker2nix", func() {
 	It("should handle multi-stage Dockerfiles", func(ctx context.Context) {
 		dockerfile := `FROM golang:1.23 AS builder
 WORKDIR /src

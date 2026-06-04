@@ -8,7 +8,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/UnstoppableMango/docker2nix)](https://github.com/UnstoppableMango/docker2nix/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Convert Dockerfiles to [nixpkgs `dockerTools.buildLayeredImage`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage) expressions.
+Convert Dockerfiles to Nix expressions for [nixpkgs `dockerTools`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage) or [nix2container](https://github.com/nlewo/nix2container).
 
 > [!WARNING]
 > Very WIP and, at this point, mostly vibed
@@ -17,11 +17,21 @@ Convert Dockerfiles to [nixpkgs `dockerTools.buildLayeredImage`](https://nixos.o
 
 ```sh
 # From stdin
-cat Dockerfile | docker2nix generate
+cat Dockerfile | docker2nix
 
 # From file
-docker2nix generate ./Dockerfile
+docker2nix ./Dockerfile
+
+# nix2container output
+docker2nix --format nix2container ./Dockerfile
 ```
+
+### Formats
+
+| Flag value | Output function |
+| --- | --- |
+| `docker-tools` (default) | `dockerTools.buildLayeredImage { ... }` |
+| `nix2container` | `nix2container.buildImage { ... }` |
 
 ### Example
 
@@ -33,7 +43,7 @@ ENV FOO=bar
 CMD ["/app/main"]
 ```
 
-Output:
+Output (`docker-tools`):
 
 ```nix
 dockerTools.buildLayeredImage {
@@ -61,7 +71,7 @@ nix build github:UnstoppableMango/docker2nix
 Or run directly:
 
 ```sh
-nix run github:UnstoppableMango/docker2nix -- generate ./Dockerfile
+nix run github:UnstoppableMango/docker2nix -- ./Dockerfile
 ```
 
 ## Development
