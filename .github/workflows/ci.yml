@@ -85,6 +85,11 @@ jobs:
         with:
           images: ghcr.io/unstoppablemango/docker2nix
 
+      - name: Fix registries.conf
+        run: |
+          out=$(nix build .#registries-conf --no-link --print-out-paths)
+          sudo cp "$out" /etc/containers/registries.conf
+
       - name: Push container
         if: github.ref == 'refs/heads/main'
         run: |

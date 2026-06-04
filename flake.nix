@@ -62,6 +62,8 @@
             inherit (inputs.nix2container.packages.${system}) nix2container;
           };
 
+          packages.registries-conf = pkgs.callPackage ./nix/registries-conf.nix { };
+
           checks.golangci-lint = pkgs.buildGoApplication {
             name = "docker2nix-lint";
             src = pkgs.lib.cleanSource ./.;
