@@ -6,5 +6,6 @@
   ],
   "nix": {
     "enabled": true
-  }
+  },
+  "automerge": true
 }
