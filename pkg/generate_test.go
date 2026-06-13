@@ -58,6 +58,20 @@ RUN apt-get update
 		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
 	})
 
+	It("should render a RUN instruction containing variables", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN GOOS=${TARGETOS} go build .
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("runAsRoot = ''"))
+		Expect(resp.GetNix()).To(ContainSubstring("GOOS=${TARGETOS} go build ."))
+	})
+
 	It("should render multiple RUN instructions into a single runAsRoot", func(ctx context.Context) {
 		req := docker2nix.GenerateRequest_builder{
 			Dockerfile: new(`FROM ubuntu:24.04
