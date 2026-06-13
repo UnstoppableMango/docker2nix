@@ -34,11 +34,15 @@ make tidy
 
 Dockerfile-to-Nix expression converter. CLI built with Cobra; core logic in `pkg/`.
 
-**Data flow:** CLI (`cmd/generate.go`) → `pkg.Generate(GenerateRequest)` → `GenerateResponse.Nix`
+**Data flow:** CLI (`cmd/root.go`) → `pkg.Generate(GenerateRequest)` → `GenerateResponse.Nix`
 
 **Protobuf-driven types:** `GenerateRequest` and `GenerateResponse` are defined in `proto/docker2nix/v1alpha1/generate.proto`, generated into `pkg/docker2nix/v1alpha1/generate.pb.go`. Type aliases live in `pkg/types.go`.
 
-**Core function:** `pkg/generate.go:Generate()` — parses a Dockerfile and renders a `dockerTools.buildLayeredImage` expression; extend it as additional Dockerfile instructions are supported.
+**Output formats:** controlled by `Format` field on `GenerateRequest` (and `--format` CLI flag):
+- `docker-tools` (default) — renders `dockerTools.buildLayeredImage`
+- `nix2container` — renders `nix2container.buildImage`
+
+**Core function:** `pkg/generate.go:Generate()` — parses a Dockerfile and dispatches to `renderNix` or `renderNix2Container` based on `Format`; extend these as additional Dockerfile instructions are supported.
 
 **Tests:**
 
