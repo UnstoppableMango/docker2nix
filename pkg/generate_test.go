@@ -69,7 +69,7 @@ RUN GOOS=${TARGETOS} go build .
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(resp.GetNix()).To(ContainSubstring("runAsRoot = ''"))
-		Expect(resp.GetNix()).To(ContainSubstring("GOOS=${TARGETOS} go build ."))
+		Expect(resp.GetNix()).To(ContainSubstring("GOOS=''${TARGETOS} go build ."))
 	})
 
 	It("should render multiple RUN instructions into a single runAsRoot", func(ctx context.Context) {
