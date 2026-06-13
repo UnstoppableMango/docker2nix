@@ -136,6 +136,20 @@ CMD ["/app/main"]
 		Eventually(parse).Should(gexec.Exit(0))
 	})
 
+	It("should render RUN instructions as runAsRoot", func(ctx context.Context) {
+		session := runGenerate(ctx, `FROM ubuntu:24.04
+RUN apt-get update
+RUN apt-get install -y curl
+`)
+
+		Eventually(session).Should(gexec.Exit(0))
+		Expect(session.Out).To(gbytes.Say(`runAsRoot`))
+		Expect(string(session.Out.Contents())).To(ContainSubstring("apt-get update"))
+		Expect(string(session.Out.Contents())).To(ContainSubstring("apt-get install -y curl"))
+		parse := nixParse(ctx, string(session.Out.Contents()))
+		Eventually(parse).Should(gexec.Exit(0))
+	})
+
 	It("should produce valid Nix for nix2container multi-stage", func(ctx context.Context) {
 		session := runGenerate(ctx, `FROM golang:1.23 AS builder
 WORKDIR /src

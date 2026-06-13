@@ -75,10 +75,19 @@ func writeStage(b *strings.Builder, s instructions.Stage, prefix string) {
 	name, tag := parseImage(s.BaseName)
 	envs := extractEnvs(s)
 	cmds := extractCmds(s)
+	runs := extractRuns(s)
 
 	b.WriteString("dockerTools.buildLayeredImage {\n")
 	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
 	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
+
+	if len(runs) > 0 {
+		fmt.Fprintf(b, "%s  runAsRoot = ''\n", prefix)
+		for _, r := range runs {
+			fmt.Fprintf(b, "%s    %s\n", prefix, nixEscapeIndented(r))
+		}
+		fmt.Fprintf(b, "%s  '';\n", prefix)
+	}
 
 	if len(envs) > 0 || len(cmds) > 0 {
 		fmt.Fprintf(b, "%s  config = {\n", prefix)
@@ -106,10 +115,19 @@ func writeAttrs(b *strings.Builder, s instructions.Stage, prefix string) {
 	name, tag := parseImage(s.BaseName)
 	envs := extractEnvs(s)
 	cmds := extractCmds(s)
+	runs := extractRuns(s)
 
 	fmt.Fprintf(b, "%s{\n", prefix)
 	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
 	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
+
+	if len(runs) > 0 {
+		fmt.Fprintf(b, "%s  runAsRoot = ''\n", prefix)
+		for _, r := range runs {
+			fmt.Fprintf(b, "%s    %s\n", prefix, nixEscapeIndented(r))
+		}
+		fmt.Fprintf(b, "%s  '';\n", prefix)
+	}
 
 	if len(envs) > 0 || len(cmds) > 0 {
 		fmt.Fprintf(b, "%s  config = {\n", prefix)
@@ -169,6 +187,26 @@ func extractCmds(s instructions.Stage) []string {
 		}
 	}
 	return result
+}
+
+func extractRuns(s instructions.Stage) []string {
+	var runs []string
+	for _, cmd := range s.Commands {
+		if r, ok := cmd.(*instructions.RunCommand); ok {
+			if r.PrependShell {
+				runs = append(runs, r.CmdLine[0])
+			} else {
+				runs = append(runs, strings.Join(r.CmdLine, " "))
+			}
+		}
+	}
+	return runs
+}
+
+func nixEscapeIndented(s string) string {
+	s = strings.ReplaceAll(s, "''", "'''")
+	s = strings.ReplaceAll(s, "${", "''${")
+	return s
 }
 
 func nixEscape(s string) string {
