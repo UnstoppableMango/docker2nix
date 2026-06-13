@@ -10,8 +10,8 @@ schema = 3
     hash = 'sha256-d1lUB0kToOsPYfRmEh9SO+iVipgmsRs4xQkj1xlY9og='
 
   [mod.'github.com/containerd/typeurl/v2']
-    version = 'v2.2.3'
-    hash = 'sha256-7hbXNe3LrJPgWbrvng8pYu9wgDp0IUvuCaq9wHhIrvs='
+    version = 'v2.3.0'
+    hash = 'sha256-SRFtlrQkfIrbnHFmk1nm8nw1agupjMkV56fXJGFPfHY='
 
   [mod.'github.com/docker/go-units']
     version = 'v0.5.0'
@@ -24,10 +24,6 @@ schema = 3
   [mod.'github.com/go-task/slim-sprig/v3']
     version = 'v3.0.0'
     hash = 'sha256-vCCw4MXVBm33VNLXcOBccVDD1CSnzDvDdWB6w5FN1cA='
-
-  [mod.'github.com/gogo/protobuf']
-    version = 'v1.3.2'
-    hash = 'sha256-pogILFrrk+cAtb0ulqn9+gRZJ7sGnnLLdtqITvxvG6c='
 
   [mod.'github.com/google/go-cmp']
     version = 'v0.7.0'
@@ -42,16 +38,16 @@ schema = 3
     hash = 'sha256-XWlYH0c8IcxAwQTnIi6WYqq44nOKUylSWxWO/vi+8pE='
 
   [mod.'github.com/moby/buildkit']
-    version = 'v0.25.1'
-    hash = 'sha256-jXQsOt91cDnjStcInkMTVGcNAPGosO6XXzVTGHrO7bs='
+    version = 'v0.30.0'
+    hash = 'sha256-aOvh5SoTyxQJ0wAfkYwV2MeC35HWvrQ1+aqE53VzsjQ='
 
   [mod.'github.com/moby/docker-image-spec']
     version = 'v1.3.1'
     hash = 'sha256-xwSNLmMagzywdGJIuhrWl1r7cIWBYCOMNYbuDDT6Jhs='
 
   [mod.'github.com/onsi/ginkgo/v2']
-    version = 'v2.29.0'
-    hash = 'sha256-MLTachXRpWLD9614nLSR8xHw3iC0dxphcJ3gm6F2Reg='
+    version = 'v2.30.0'
+    hash = 'sha256-fTeS+5LILSIi6hm6EnoYLTaAaqMFu0rx5favGcXGKQ0='
 
   [mod.'github.com/onsi/gomega']
     version = 'v1.41.0'
@@ -78,8 +74,8 @@ schema = 3
     hash = 'sha256-nbRCTFiDCC2jKK7AHi79n7urYCMP5yDZnWtNVJrDi+k='
 
   [mod.'github.com/spf13/pflag']
-    version = 'v1.0.9'
-    hash = 'sha256-YAjyYpq5BXCosVJtvYLWFG1t4gma2ylzc7ILLoj/hD8='
+    version = 'v1.0.10'
+    hash = 'sha256-uDPnWjHpSrzXr17KEYEA1yAbizfcsfo5AyztY2tS6ZU='
 
   [mod.'github.com/tonistiigi/go-csvvalue']
     version = 'v0.0.0-20240814133006-030d3b2625d0'

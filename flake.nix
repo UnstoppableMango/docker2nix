@@ -92,7 +92,6 @@
 
             GO = "${pkgs.go}/bin/go";
             GOMOD2NIX = "${pkgs.gomod2nix}/bin/gomod2nix";
-            GINKGO = "${pkgs.ginkgo}/bin/ginkgo";
           };
 
           treefmt.programs = {
