@@ -117,7 +117,7 @@ make tidy
 | `FROM` | Supported |
 | `ENV` | Supported |
 | `CMD` | Supported |
-| `RUN` | Parsed, not yet rendered |
+| `RUN` | Supported (docker-tools only) |
 | `COPY` | Parsed, not yet rendered |
 | Multi-stage (`AS`) | Supported |
 

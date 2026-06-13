@@ -38,8 +38,54 @@ CMD ["/app/main"]
 		Expect(err).NotTo(HaveOccurred())
 		Expect(resp.GetNix()).To(ContainSubstring("dockerTools.buildLayeredImage"))
 		Expect(resp.GetNix()).To(ContainSubstring(`name = "ubuntu"`))
+		Expect(resp.GetNix()).To(ContainSubstring("runAsRoot"))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get update && apt-get install -y curl"))
 		Expect(resp.GetNix()).To(ContainSubstring(`"FOO=bar"`))
 		Expect(resp.GetNix()).To(ContainSubstring(`"/app/main"`))
+	})
+
+	It("should render a single RUN instruction as runAsRoot", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN apt-get update
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("runAsRoot = ''"))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
+	})
+
+	It("should render multiple RUN instructions into a single runAsRoot", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN apt-get update
+RUN apt-get install -y curl
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("runAsRoot = ''"))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get install -y curl"))
+	})
+
+	It("should render exec-form RUN as joined args in runAsRoot", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN ["apt-get", "install", "-y", "curl"]
+`),
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("runAsRoot = ''"))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get install -y curl"))
 	})
 
 	It("should handle multi-stage Dockerfiles", func(ctx context.Context) {
