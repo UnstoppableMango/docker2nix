@@ -39,6 +39,7 @@ Dockerfile-to-Nix expression converter. CLI built with Cobra; core logic in `pkg
 **Protobuf-driven types:** `GenerateRequest` and `GenerateResponse` are defined in `proto/docker2nix/v1alpha1/generate.proto`, generated into `pkg/docker2nix/v1alpha1/generate.pb.go`. Type aliases live in `pkg/types.go`.
 
 **Output formats:** controlled by `Format` field on `GenerateRequest` (and `--format` CLI flag):
+
 - `docker-tools` (default) — renders `dockerTools.buildLayeredImage`
 - `nix2container` — renders `nix2container.buildImage`
 
