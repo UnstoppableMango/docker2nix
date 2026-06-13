@@ -1,6 +1,6 @@
 GO        ?= go
 GOMOD2NIX ?= gomod2nix
-GINKGO    ?= ginkgo
+GINKGO    := go tool ginkgo
 
 GO_SRC ?= $(shell find . -name '*.go')
 
