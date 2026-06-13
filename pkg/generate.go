@@ -250,10 +250,23 @@ func writeStageNix2Container(b *strings.Builder, s instructions.Stage, prefix st
 	name, tag := parseImage(s.BaseName)
 	envs := extractEnvs(s)
 	cmds := extractCmds(s)
+	runs := extractRuns(s)
 
 	b.WriteString("nix2container.buildImage {\n")
 	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
 	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
+
+	if len(runs) > 0 {
+		fmt.Fprintf(b, "%s  layers = [\n", prefix)
+		fmt.Fprintf(b, "%s    (nix2container.buildLayer {\n", prefix)
+		fmt.Fprintf(b, "%s      deps = [(pkgs.runCommand \"run-layer\" {} ''\n", prefix)
+		for _, r := range runs {
+			fmt.Fprintf(b, "%s        %s\n", prefix, nixEscapeIndented(r))
+		}
+		fmt.Fprintf(b, "%s      '')];\n", prefix)
+		fmt.Fprintf(b, "%s    })\n", prefix)
+		fmt.Fprintf(b, "%s  ];\n", prefix)
+	}
 
 	if len(envs) > 0 || len(cmds) > 0 {
 		fmt.Fprintf(b, "%s  config = {\n", prefix)
@@ -281,10 +294,23 @@ func writeAttrsNix2Container(b *strings.Builder, s instructions.Stage, prefix st
 	name, tag := parseImage(s.BaseName)
 	envs := extractEnvs(s)
 	cmds := extractCmds(s)
+	runs := extractRuns(s)
 
 	fmt.Fprintf(b, "%s{\n", prefix)
 	fmt.Fprintf(b, "%s  name = \"%s\";\n", prefix, name)
 	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
+
+	if len(runs) > 0 {
+		fmt.Fprintf(b, "%s  layers = [\n", prefix)
+		fmt.Fprintf(b, "%s    (nix2container.buildLayer {\n", prefix)
+		fmt.Fprintf(b, "%s      deps = [(pkgs.runCommand \"run-layer\" {} ''\n", prefix)
+		for _, r := range runs {
+			fmt.Fprintf(b, "%s        %s\n", prefix, nixEscapeIndented(r))
+		}
+		fmt.Fprintf(b, "%s      '')];\n", prefix)
+		fmt.Fprintf(b, "%s    })\n", prefix)
+		fmt.Fprintf(b, "%s  ];\n", prefix)
+	}
 
 	if len(envs) > 0 || len(cmds) > 0 {
 		fmt.Fprintf(b, "%s  config = {\n", prefix)

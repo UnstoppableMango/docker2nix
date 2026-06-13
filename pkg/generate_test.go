@@ -274,4 +274,73 @@ CMD ["/app/main"]
 		Expect(resp.GetNix()).To(ContainSubstring("builder"))
 		Expect(resp.GetNix()).To(ContainSubstring(`name = "ubuntu"`))
 	})
+
+	It("should render a single RUN as a pkgs.runCommand layer", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN apt-get update
+`),
+			Format: &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("layers = ["))
+		Expect(resp.GetNix()).To(ContainSubstring("nix2container.buildLayer"))
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer"`))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
+	})
+
+	It("should consolidate multiple RUN instructions into a single runCommand", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN apt-get update
+RUN apt-get install -y curl
+`),
+			Format: &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer"`))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get install -y curl"))
+	})
+
+	It("should render exec-form RUN as joined args in runCommand", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN ["apt-get", "install", "-y", "curl"]
+`),
+			Format: &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer"`))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get install -y curl"))
+	})
+
+	It("should render RUN with ENV and CMD", func(ctx context.Context) {
+		req := docker2nix.GenerateRequest_builder{
+			Dockerfile: new(`FROM ubuntu:24.04
+RUN apt-get update
+ENV FOO=bar
+CMD ["/bin/sh"]
+`),
+			Format: &format,
+		}
+
+		resp, err := docker2nix.Generate(ctx, req.Build())
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.GetNix()).To(ContainSubstring("layers = ["))
+		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
+		Expect(resp.GetNix()).To(ContainSubstring(`"FOO=bar"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`"/bin/sh"`))
+		Expect(resp.GetNix()).To(ContainSubstring("config = {"))
+	})
 })
