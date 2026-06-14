@@ -246,6 +246,38 @@ func renderNix2Container(stages []instructions.Stage) string {
 	return b.String()
 }
 
+func writeRunLayers(b *strings.Builder, runs []string, prefix string) {
+	fmt.Fprintf(b, "%s  layers = [\n", prefix)
+	for i, r := range runs {
+		fmt.Fprintf(b, "%s    # WARNING: RUN translated to pkgs.runCommand — no base image access, no network\n", prefix)
+		fmt.Fprintf(b, "%s    (nix2container.buildLayer {\n", prefix)
+		fmt.Fprintf(b, "%s      deps = [(pkgs.runCommand \"run-layer-%d\" {} ''\n", prefix, i)
+		fmt.Fprintf(b, "%s        %s\n", prefix, nixEscapeIndented(r))
+		fmt.Fprintf(b, "%s      '')];\n", prefix)
+		fmt.Fprintf(b, "%s    })\n", prefix)
+	}
+	fmt.Fprintf(b, "%s  ];\n", prefix)
+}
+
+func writeConfigNix2Container(b *strings.Builder, envs []string, cmds []string, prefix string) {
+	fmt.Fprintf(b, "%s  config = {\n", prefix)
+	if len(envs) > 0 {
+		fmt.Fprintf(b, "%s    env = [\n", prefix)
+		for _, e := range envs {
+			fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
+		}
+		fmt.Fprintf(b, "%s    ];\n", prefix)
+	}
+	if len(cmds) > 0 {
+		fmt.Fprintf(b, "%s    cmd = [\n", prefix)
+		for _, c := range cmds {
+			fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
+		}
+		fmt.Fprintf(b, "%s    ];\n", prefix)
+	}
+	fmt.Fprintf(b, "%s  };\n", prefix)
+}
+
 func writeStageNix2Container(b *strings.Builder, s instructions.Stage, prefix string) {
 	name, tag := parseImage(s.BaseName)
 	envs := extractEnvs(s)
@@ -257,34 +289,11 @@ func writeStageNix2Container(b *strings.Builder, s instructions.Stage, prefix st
 	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
 
 	if len(runs) > 0 {
-		fmt.Fprintf(b, "%s  layers = [\n", prefix)
-		fmt.Fprintf(b, "%s    (nix2container.buildLayer {\n", prefix)
-		fmt.Fprintf(b, "%s      deps = [(pkgs.runCommand \"run-layer\" {} ''\n", prefix)
-		for _, r := range runs {
-			fmt.Fprintf(b, "%s        %s\n", prefix, nixEscapeIndented(r))
-		}
-		fmt.Fprintf(b, "%s      '')];\n", prefix)
-		fmt.Fprintf(b, "%s    })\n", prefix)
-		fmt.Fprintf(b, "%s  ];\n", prefix)
+		writeRunLayers(b, runs, prefix)
 	}
 
 	if len(envs) > 0 || len(cmds) > 0 {
-		fmt.Fprintf(b, "%s  config = {\n", prefix)
-		if len(envs) > 0 {
-			fmt.Fprintf(b, "%s    env = [\n", prefix)
-			for _, e := range envs {
-				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
-			}
-			fmt.Fprintf(b, "%s    ];\n", prefix)
-		}
-		if len(cmds) > 0 {
-			fmt.Fprintf(b, "%s    cmd = [\n", prefix)
-			for _, c := range cmds {
-				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
-			}
-			fmt.Fprintf(b, "%s    ];\n", prefix)
-		}
-		fmt.Fprintf(b, "%s  };\n", prefix)
+		writeConfigNix2Container(b, envs, cmds, prefix)
 	}
 
 	fmt.Fprintf(b, "%s}", prefix)
@@ -301,34 +310,11 @@ func writeAttrsNix2Container(b *strings.Builder, s instructions.Stage, prefix st
 	fmt.Fprintf(b, "%s  tag = \"%s\";\n", prefix, tag)
 
 	if len(runs) > 0 {
-		fmt.Fprintf(b, "%s  layers = [\n", prefix)
-		fmt.Fprintf(b, "%s    (nix2container.buildLayer {\n", prefix)
-		fmt.Fprintf(b, "%s      deps = [(pkgs.runCommand \"run-layer\" {} ''\n", prefix)
-		for _, r := range runs {
-			fmt.Fprintf(b, "%s        %s\n", prefix, nixEscapeIndented(r))
-		}
-		fmt.Fprintf(b, "%s      '')];\n", prefix)
-		fmt.Fprintf(b, "%s    })\n", prefix)
-		fmt.Fprintf(b, "%s  ];\n", prefix)
+		writeRunLayers(b, runs, prefix)
 	}
 
 	if len(envs) > 0 || len(cmds) > 0 {
-		fmt.Fprintf(b, "%s  config = {\n", prefix)
-		if len(envs) > 0 {
-			fmt.Fprintf(b, "%s    env = [\n", prefix)
-			for _, e := range envs {
-				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(e))
-			}
-			fmt.Fprintf(b, "%s    ];\n", prefix)
-		}
-		if len(cmds) > 0 {
-			fmt.Fprintf(b, "%s    cmd = [\n", prefix)
-			for _, c := range cmds {
-				fmt.Fprintf(b, "%s      \"%s\"\n", prefix, nixEscape(c))
-			}
-			fmt.Fprintf(b, "%s    ];\n", prefix)
-		}
-		fmt.Fprintf(b, "%s  };\n", prefix)
+		writeConfigNix2Container(b, envs, cmds, prefix)
 	}
 
 	fmt.Fprintf(b, "%s}", prefix)

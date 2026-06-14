@@ -2,6 +2,7 @@ package docker2nix_test
 
 import (
 	"context"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -288,11 +289,12 @@ RUN apt-get update
 		Expect(err).NotTo(HaveOccurred())
 		Expect(resp.GetNix()).To(ContainSubstring("layers = ["))
 		Expect(resp.GetNix()).To(ContainSubstring("nix2container.buildLayer"))
-		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer-0"`))
 		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
+		Expect(resp.GetNix()).To(ContainSubstring("WARNING: RUN translated to pkgs.runCommand"))
 	})
 
-	It("should consolidate multiple RUN instructions into a single runCommand", func(ctx context.Context) {
+	It("should emit one buildLayer per RUN instruction", func(ctx context.Context) {
 		req := docker2nix.GenerateRequest_builder{
 			Dockerfile: new(`FROM ubuntu:24.04
 RUN apt-get update
@@ -304,9 +306,12 @@ RUN apt-get install -y curl
 		resp, err := docker2nix.Generate(ctx, req.Build())
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer-0"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer-1"`))
 		Expect(resp.GetNix()).To(ContainSubstring("apt-get update"))
 		Expect(resp.GetNix()).To(ContainSubstring("apt-get install -y curl"))
+		Expect(strings.Count(resp.GetNix(), "nix2container.buildLayer")).To(Equal(2))
+		Expect(strings.Count(resp.GetNix(), "WARNING: RUN translated to pkgs.runCommand")).To(Equal(2))
 	})
 
 	It("should render exec-form RUN as joined args in runCommand", func(ctx context.Context) {
@@ -320,7 +325,7 @@ RUN ["apt-get", "install", "-y", "curl"]
 		resp, err := docker2nix.Generate(ctx, req.Build())
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer"`))
+		Expect(resp.GetNix()).To(ContainSubstring(`pkgs.runCommand "run-layer-0"`))
 		Expect(resp.GetNix()).To(ContainSubstring("apt-get install -y curl"))
 	})
 
