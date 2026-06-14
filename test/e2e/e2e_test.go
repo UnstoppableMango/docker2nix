@@ -150,6 +150,18 @@ RUN apt-get install -y curl
 		Eventually(parse).Should(gexec.Exit(0))
 	})
 
+	It("should render RUN instructions containing variables", func(ctx context.Context) {
+		session := runGenerate(ctx, `FROM ubuntu:24.04
+RUN GOOS=${TARGETOS} go build .
+`)
+
+		Eventually(session).Should(gexec.Exit(0))
+		Expect(session.Out).To(gbytes.Say(`runAsRoot`))
+		Expect(string(session.Out.Contents())).To(ContainSubstring("GOOS=''${TARGETOS} go build ."))
+		parse := nixParse(ctx, string(session.Out.Contents()))
+		Eventually(parse).Should(gexec.Exit(0))
+	})
+
 	It("should produce valid Nix for nix2container multi-stage", func(ctx context.Context) {
 		session := runGenerate(ctx, `FROM golang:1.23 AS builder
 WORKDIR /src
