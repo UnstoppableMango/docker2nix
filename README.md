@@ -64,7 +64,7 @@ Multi-stage Dockerfiles are supported. Named stages become `let` bindings in the
 
 ### RUN instructions (nix2container)
 
-nix2container is intentionally designed around Nix derivations, not imperative shell commands. It has no equivalent of `dockerTools.runAsRoot`. Each `RUN` instruction is approximated as a [`nix2container.buildLayer`](https://github.com/nlewo/nix2container#nix2containerbuildlayer) wrapping a `pkgs.runCommand`, one layer per instruction to match Docker's layering model.
+nix2container is intentionally designed around Nix derivations, not imperative shell commands. It has no equivalent of `runAsRoot` in `dockerTools.buildLayeredImage`. Each `RUN` instruction is approximated as a [`nix2container.buildLayer`](https://github.com/nlewo/nix2container#nix2containerbuildlayer) wrapping a `pkgs.runCommand`, one layer per instruction to match Docker's layering model.
 
 > [!WARNING]
 > Manual translation to Nix derivations is required for most real `RUN` commands.
