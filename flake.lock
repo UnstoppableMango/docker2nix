@@ -1,5 +1,41 @@
 {
   "nodes": {
+    "a2b": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "gomod2nix": [
+          "gomod2nix"
+        ],
+        "mangonix": [
+          "mangonix"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ],
+        "treefmt-nix": [
+          "treefmt-nix"
+        ],
+        "ux": "ux"
+      },
+      "locked": {
+        "lastModified": 1781399204,
+        "narHash": "sha256-DPHhRVzMq/flqxl+7cqLENin3dXo9ffKK2gaDAqZWYA=",
+        "owner": "UnstoppableMango",
+        "repo": "a2b",
+        "rev": "157da3daf869fcc31346c52796ee3d8316469ec6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "UnstoppableMango",
+        "repo": "a2b",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -156,6 +192,7 @@
     },
     "root": {
       "inputs": {
+        "a2b": "a2b",
         "flake-parts": "flake-parts",
         "gomod2nix": "gomod2nix",
         "mangonix": "mangonix",
@@ -197,6 +234,43 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "ux": {
+      "inputs": {
+        "flake-parts": [
+          "a2b",
+          "flake-parts"
+        ],
+        "gomod2nix": [
+          "a2b",
+          "gomod2nix"
+        ],
+        "nixpkgs": [
+          "a2b",
+          "nixpkgs"
+        ],
+        "systems": [
+          "a2b",
+          "systems"
+        ],
+        "treefmt-nix": [
+          "a2b",
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780304788,
+        "narHash": "sha256-PZ73GkRxUhbl6whitztVgdI/RsdyEmYXJeJUNdZhHv0=",
+        "owner": "unstoppablemango",
+        "repo": "ux",
+        "rev": "92709ae1ea157b685d949fb48560d8983085988a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "unstoppablemango",
+        "repo": "ux",
         "type": "github"
       }
     }
