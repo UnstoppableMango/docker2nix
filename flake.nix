@@ -35,6 +35,16 @@
       inputs.treefmt-nix.follows = "treefmt-nix";
       inputs.nix2container.follows = "nix2container";
     };
+
+    a2b = {
+      url = "github:UnstoppableMango/a2b";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.systems.follows = "systems";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+      inputs.gomod2nix.follows = "gomod2nix";
+      inputs.mangonix.follows = "mangonix";
+    };
   };
 
   outputs =
@@ -44,7 +54,12 @@
       imports = with inputs; [ treefmt-nix.flakeModule ];
 
       perSystem =
-        { pkgs, system, ... }:
+        {
+          pkgs,
+          system,
+          inputs',
+          ...
+        }:
         let
           version = "0.0.1";
           docker2nix = pkgs.callPackage ./nix { inherit version; };
@@ -63,6 +78,10 @@
           };
 
           packages.registries-conf = pkgs.callPackage ./nix/registries-conf.nix { };
+
+          packages.proto = pkgs.callPackage ./nix/proto.nix {
+            a2b = inputs'.a2b.legacyPackages.lib;
+          };
 
           checks.golangci-lint = pkgs.buildGoApplication {
             name = "docker2nix-lint";
