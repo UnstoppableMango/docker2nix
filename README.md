@@ -62,6 +62,13 @@ dockerTools.buildLayeredImage {
 
 Multi-stage Dockerfiles are supported. Named stages become `let` bindings in the output.
 
+### RUN instructions (nix2container)
+
+nix2container is intentionally designed around Nix derivations, not imperative shell commands. It has no equivalent of `runAsRoot` in `dockerTools.buildLayeredImage`. Each `RUN` instruction is approximated as a [`nix2container.buildLayer`](https://github.com/nlewo/nix2container#nix2containerbuildlayer) wrapping a `pkgs.runCommand`, one layer per instruction to match Docker's layering model.
+
+> [!WARNING]
+> Manual translation to Nix derivations is required for most real `RUN` commands.
+
 ## Installation
 
 ```sh
@@ -117,7 +124,7 @@ make tidy
 | `FROM` | Supported |
 | `ENV` | Supported |
 | `CMD` | Supported |
-| `RUN` | Supported (docker-tools only) |
+| `RUN` | Supported |
 | `COPY` | Parsed, not yet rendered |
 | Multi-stage (`AS`) | Supported |
 
