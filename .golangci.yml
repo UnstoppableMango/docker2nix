@@ -1,0 +1,31 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - exhaustive
+    - gocritic
+    - misspell
+    - prealloc
+    - revive
+    - unconvert
+    - unparam
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+    revive:
+      rules:
+        - name: dot-imports
+          arguments:
+            - allowedPackages:
+                - "github.com/onsi/ginkgo/v2"
+                - "github.com/onsi/gomega"
+
+issues:
+  exclude-rules:
+    - path: ".*\\.pb\\.go"
+      linters:
+        - all
+    - path: "pkg/types\\.go"
+      linters:
+        - revive
