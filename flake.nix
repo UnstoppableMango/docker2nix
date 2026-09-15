@@ -17,7 +17,7 @@
     # rebuilding skopeo from source.
     mangopkgs.url = "github:unmango/pkgs";
     nixpkgs.follows = "mangopkgs/nixpkgs";
-    systems.url = "github:nix-systems/default";
+    systems.url = "github:UnstoppableMango/nix-systems";
 
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
@@ -62,7 +62,10 @@
     inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
-      imports = with inputs; [ treefmt-nix.flakeModule ];
+      imports = with inputs; [
+        systems.flakeModule
+        treefmt-nix.flakeModule
+      ];
 
       perSystem =
         {
