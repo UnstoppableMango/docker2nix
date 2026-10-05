@@ -1,11 +1,11 @@
 module github.com/unstoppablemango/docker2nix
 
-go 1.26.3
+go 1.26.8
 
 tool github.com/onsi/ginkgo/v2/ginkgo
 
 require (
-	github.com/moby/buildkit v0.33.0
+	github.com/moby/buildkit v0.33.1
 	github.com/onsi/ginkgo/v2 v2.33.0
 	github.com/onsi/gomega v1.44.0
 	github.com/spf13/cobra v1.10.2
