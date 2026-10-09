@@ -7,6 +7,7 @@
 [![codecov](https://codecov.io/gh/UnstoppableMango/docker2nix/graph/badge.svg)](https://codecov.io/gh/UnstoppableMango/docker2nix)
 [![GitHub release](https://img.shields.io/github/v/release/UnstoppableMango/docker2nix)](https://github.com/UnstoppableMango/docker2nix/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Hercules CI](https://hercules-ci.com/api/v1/site/github/account/UnstoppableMango/project/docker2nix/badge)](https://hercules-ci.com/github/UnstoppableMango/docker2nix)
 
 Convert Dockerfiles to Nix expressions for [nixpkgs `dockerTools`](https://nixos.org/manual/nixpkgs/stable/#ssec-pkgs-dockerTools-buildLayeredImage) or [nix2container](https://github.com/nlewo/nix2container).
 
