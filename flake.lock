@@ -9,6 +9,7 @@
         "nixpkgs": [
           "nixpkgs"
         ],
+        "openapi2go": "openapi2go",
         "pulumi2nix": "pulumi2nix",
         "pulumipkgs": "pulumipkgs",
         "systems": [
@@ -19,11 +20,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791691397,
-        "narHash": "sha256-74Q54sjPxFqC1JzD0uCfsApP4mGiSU57/vPVHwVTvWc=",
+        "lastModified": 1792210901,
+        "narHash": "sha256-6oQKx1NXZ5CFw3d8q9oifG8qy9+8GdLIa0Q/mGXwkdU=",
         "owner": "UnstoppableMango",
         "repo": "a2b",
-        "rev": "8af70b34aa3a30589844fd1bd4147248be16ceea",
+        "rev": "031ad309af9cf6c4f192a55edd1aa48bdeded127",
         "type": "github"
       },
       "original": {
@@ -258,11 +259,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791684581,
-        "narHash": "sha256-xdI8SYi5Btp7LMZXSHnCqQ5KPsNG5REWYzlw+593lbM=",
+        "lastModified": 1792185409,
+        "narHash": "sha256-2Y+ZTNYMeBY10M7e2oSWMLznbzzzmWCsPlYzPT4gJ3U=",
         "owner": "unmango",
         "repo": "pkgs",
-        "rev": "f060dcb07d39851d8da4a42d8b43d618044d9fa3",
+        "rev": "48a60763cd0a0ef7d9d7eca2f02c5dae8a0dc3d8",
         "type": "github"
       },
       "original": {
@@ -281,11 +282,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792074214,
-        "narHash": "sha256-qdgEo+XcWwlkh1auz+OjSJI9inGaOwJTjHXx24gsapM=",
+        "lastModified": 1792185409,
+        "narHash": "sha256-2Y+ZTNYMeBY10M7e2oSWMLznbzzzmWCsPlYzPT4gJ3U=",
         "owner": "unmango",
         "repo": "pkgs",
-        "rev": "d354dd023c6ed8bf76f9475bf810ba06ce4cfd5a",
+        "rev": "48a60763cd0a0ef7d9d7eca2f02c5dae8a0dc3d8",
         "type": "github"
       },
       "original": {
@@ -339,17 +340,55 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1791594108,
-        "narHash": "sha256-XK4KceonkwD8LuMAt/vNrz982mXJM5jeHAxMwsUXXAQ=",
+        "lastModified": 1791734076,
+        "narHash": "sha256-i5qk1kLiit98rRbh1AXmWBNT9QXC/y4l5Wk/u5EdpDQ=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "6510408d147d8c5e6d76043e899e9251756f6a75",
+        "rev": "7fd4004d0511991fff3a0524856a9be09e28c5f0",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "openapi2go": {
+      "inputs": {
+        "flake-parts": [
+          "a2b",
+          "flake-parts"
+        ],
+        "gomod2nix": [
+          "a2b",
+          "mangopkgs",
+          "gomod2nix"
+        ],
+        "nixpkgs": [
+          "a2b",
+          "nixpkgs"
+        ],
+        "systems": [
+          "a2b",
+          "systems"
+        ],
+        "treefmt-nix": [
+          "a2b",
+          "treefmt-nix"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790002315,
+        "narHash": "sha256-JZw0eZgfUbgCT/oMFL9gNnA8phWsldKLGQYBUFQ/gKc=",
+        "owner": "UnstoppableMango",
+        "repo": "openapi2go",
+        "rev": "65bc1785e49a7b73313b2911bfb1a0b2624859fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "UnstoppableMango",
+        "repo": "openapi2go",
         "type": "github"
       }
     },
