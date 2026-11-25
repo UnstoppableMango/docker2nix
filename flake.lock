@@ -205,6 +205,31 @@
         "type": "github"
       }
     },
+    "hercules-ci-effects": {
+      "inputs": {
+        "flake-parts": [
+          "mangonix",
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "mangonix",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794718771,
+        "narHash": "sha256-3edxvSEsSydCs3FH3m0BQswY/84BhJeDdD4JVEVJmNY=",
+        "owner": "hercules-ci",
+        "repo": "hercules-ci-effects",
+        "rev": "eb94ef1ca6da1029c0435cdb09fe269ddb5075cd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "hercules-ci-effects",
+        "type": "github"
+      }
+    },
     "mangonix": {
       "inputs": {
         "flake-parts": [
@@ -213,6 +238,7 @@
         "gomod2nix": [
           "gomod2nix"
         ],
+        "hercules-ci-effects": "hercules-ci-effects",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -224,11 +250,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795370560,
-        "narHash": "sha256-Tej4Be1DE4l2tjX7+9bnNks5zfrscO88ueoUulG4z1k=",
+        "lastModified": 1795576755,
+        "narHash": "sha256-A+JBGjUO4KQby15FGtFT+KQWaObqVvMeBQ5CNW0GoGg=",
         "owner": "UnstoppableMango",
         "repo": "nix",
-        "rev": "da0269692e6727050b31ad43672198ce3602aacd",
+        "rev": "c5c6195918a039c3242dcb24abbe38a1fc6352c7",
         "type": "github"
       },
       "original": {
