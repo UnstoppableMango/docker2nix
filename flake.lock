@@ -250,11 +250,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795576755,
-        "narHash": "sha256-A+JBGjUO4KQby15FGtFT+KQWaObqVvMeBQ5CNW0GoGg=",
+        "lastModified": 1795749983,
+        "narHash": "sha256-xcSmnKo8guy0g8utdsuK0/SY8U8bYVX4sC4aUsZ0yyQ=",
         "owner": "UnstoppableMango",
         "repo": "nix",
-        "rev": "c5c6195918a039c3242dcb24abbe38a1fc6352c7",
+        "rev": "a7455d8664fcb821ab80d3fd2af0bdf3ae3b6ca4",
         "type": "github"
       },
       "original": {
